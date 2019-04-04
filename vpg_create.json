@@ -1,0 +1,239 @@
+{
+  "$schema": "http://json-schema.org/schema#",
+  "type": "object",
+  "properties": {
+    "auth": {
+      "type": "object",
+      "properties": {
+        "zerto": {
+          "type": "object"
+        }
+      },
+      "required": ["zerto"]
+    },
+    "logging": {
+      "type": "object",
+      "properties": {
+        "level": {
+          "type": "integer"
+        }
+      }
+    },
+    "vpgSetting": {
+      "type": "object",
+      "properties": {
+        "VMs": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "properties": {
+              "VM": {
+                "type": "string",
+                "minLength": 1
+              },
+              "HostName": {
+                "type": "string"
+              },
+              "IsThin": {
+                "type": "boolean"
+              },
+              "Folder": {
+                "type": "string"
+              },
+              "DatastoreName": {
+                "type": "string"
+              },
+              "Nics": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "Failover": {
+                      "type": "object",
+                      "properties": {
+                        "Network": {
+                          "type": "string",
+                          "minLength": 1
+                        },
+                        "StaticIp": {
+                          "type": "string",
+                          "minLength": 1
+                        },
+                        "SubnetMask": {
+                          "type": "string",
+                          "minLength": 1
+                        },
+                        "Gateway": {
+                          "type": "string",
+                          "minLength": 1
+                        }
+                      },
+                      "required": [
+                        "Gateway",
+                        "Network",
+                        "StaticIp",
+                        "SubnetMask"
+                      ]
+                    },
+                    "FailoverTest": {
+                      "type": "object",
+                      "properties": {
+                        "Network": {
+                          "type": "string",
+                          "minLength": 1
+                        },
+                        "StaticIp": {
+                          "type": "string",
+                          "minLength": 1
+                        },
+                        "SubnetMask": {
+                          "type": "string",
+                          "minLength": 1
+                        },
+                        "Gateway": {
+                          "type": "string",
+                          "minLength": 1
+                        }
+                      },
+                      "required": [
+                        "Gateway",
+                        "Network",
+                        "StaticIp",
+                        "SubnetMask"
+                      ]
+                    }
+                  },
+                  "required": [
+                    "Failover",
+                    "FailoverTest"
+                  ]
+                }
+              }
+            },
+            "required": [
+              "VM"
+            ]
+          }
+        },
+        "VPGName": {
+          "type": "string",
+          "minLength": 1
+        },
+        "RecoverySiteName": {
+          "type": "string",
+          "minLength": 1,
+          "x-flowor-lookup": {
+            "type": "zerto:VirtualizationSite",
+            "index": "zerto",
+            "multiple": false
+          }
+        },
+        "FailoverNetwork": {
+          "type": "string",
+          "minLength": 1,
+          "watch": {
+            "site": "vpgSetting.RecoverySiteName"
+          },
+          "x-flowor-lookup": {
+            "type": "zerto:SiteNetwork",
+            "index": "zerto",
+            "multiple": true
+          }
+        },
+        "TestNetwork": {
+          "type": "string",
+          "minLength": 1,
+          "watch": {
+            "site": "vpgSetting.RecoverySiteName"
+          },
+          "x-flowor-lookup": {
+            "type": "zerto:SiteNetwork",
+            "index": "zerto",
+            "multiple": true
+          }
+        },
+        "HostName": {
+          "type": "string",
+          "watch": {
+            "site": "vpgSetting.RecoverySiteName"
+          },
+          "x-flowor-lookup": {
+            "type": "zerto:SiteHost",
+            "index": "zerto",
+            "multiple": false
+          }
+        },
+        "Folder": {
+          "type": "string",
+          "minLength": 1,
+          "watch": {
+            "site": "vpgSetting.RecoverySiteName"
+          },
+          "x-flowor-lookup": {
+            "type": "zerto:SiteFolder",
+            "index": "zerto",
+            "multiple": false
+          }
+        },
+        "DatastoreName": {
+          "type": "string",
+          "minLength": 1,
+          "watch": {
+            "site": "vpgSetting.RecoverySiteName"
+          },
+          "x-flowor-lookup": {
+            "type": "zerto:SiteDatastore",
+            "index": "zerto",
+            "multiple": true
+          }
+        },
+        "ClusterName": {
+          "type": "string",
+          "watch": {
+            "site": "vpgSetting.RecoverySiteName"
+          },
+          "x-flowor-lookup": {
+            "type": "zerto:SiteCluster",
+            "index": "zerto",
+            "multiple": false
+          }
+        },
+        "JournalHistoryInHours": {
+          "type": "integer",
+          "default": 24
+        },
+        "ReplicationPriority": {
+          "type": "string",
+          "default": "Low",
+          "enum": ["Low", "Medium", "High"]
+        },
+        "RpoAlertInSeconds": {
+          "type": "integer",
+          "default": 300
+        },
+        "TestIntervalInMinutes": {
+          "type": "integer",
+          "default": 0
+        },
+        "UseWanCompression": {
+          "type": "boolean",
+          "default": true
+        }
+      },
+      "required": [
+        "VMs",
+        "VPGName",
+        "RecoverySiteName",
+        "DatastoreName",
+        "FailoverNetwork",
+        "TestNetwork",
+        "Folder"
+      ]
+    }
+  },
+  "required": [
+    "auth",
+    "vpgSetting"
+  ]
+}
