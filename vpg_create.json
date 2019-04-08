@@ -6,7 +6,31 @@
       "type": "object",
       "properties": {
         "zerto": {
-          "type": "object"
+          "type": "object",
+          "description": "The host and login credentials for a ZertoVM server.",
+          "properties": {
+            "host": {
+              "description": "The IP address (or the FQDN) of the Zerto server.",
+              "type": "string",
+              "minLength": 1
+            },
+            "port": {
+              "description": "The port number to use for connection, default to 9669.",
+              "type": "number",
+              "exclusiveMinimum": 0,
+              "default": 9669
+            },
+            "user": {
+              "description": "The user ID used for authentication.",
+              "type": "string",
+              "minLength": 1
+            },
+            "password": {
+              "description": "The password used for authentication.",
+              "type": "string",
+              "minLength": 1
+            }
+          }
         }
       },
       "required": ["zerto"]
@@ -15,14 +39,19 @@
       "type": "object",
       "properties": {
         "level": {
-          "type": "integer"
+          "type": "number",
+          "minimum": 0,
+          "maximum": 2,
+          "default": 0
         }
       }
     },
     "vpgSetting": {
+      "description": "A structure defining the vpgSetting entity to be created.",
       "type": "object",
       "properties": {
         "VMs": {
+          "description": "A list of VMs to be included in the VPG.",
           "type": "array",
           "minItems": 1,
           "items": {
@@ -30,42 +59,54 @@
             "properties": {
               "VM": {
                 "type": "string",
+                "description": "The name of the VM to be included",
                 "minLength": 1
               },
               "HostName": {
-                "type": "string"
+                "type": "string",
+                "description": "The host name specialized for this VM."
               },
               "IsThin": {
-                "type": "boolean"
+                "type": "boolean",
+                "description": "A boolean specifying whether the named VM will be provisioned with thin storage.",
+                "default": true
               },
               "Folder": {
-                "type": "string"
+                "type": "string",
+                "description": "The folder specialized for the named VM"
               },
               "DatastoreName": {
-                "type": "string"
+                "type": "string",
+                "description": "The datastore to use for the named VM"
               },
               "Nics": {
+                "description": "The details for the NIC settings for the named VM",
                 "type": "array",
                 "items": {
                   "type": "object",
                   "properties": {
                     "Failover": {
+                      "description": "An object specifying the properties for the network used for VPG failover operation.",
                       "type": "object",
                       "properties": {
                         "Network": {
                           "type": "string",
+                          "description": "The network to use.",
                           "minLength": 1
                         },
                         "StaticIp": {
                           "type": "string",
+                          "description": "The static IP address to be assigned.",
                           "minLength": 1
                         },
                         "SubnetMask": {
                           "type": "string",
+                          "description": "The subnet mask for the corresponding IP address.",
                           "minLength": 1
                         },
                         "Gateway": {
                           "type": "string",
+                          "description": "The gateway to use for this NIC.",
                           "minLength": 1
                         }
                       },
@@ -74,25 +115,31 @@
                         "Network",
                         "StaticIp",
                         "SubnetMask"
-                      ]
+                      ],
+                      "additionalProperties": false
                     },
                     "FailoverTest": {
+                      "description": "An object specifying the properties for the network to use when testing VPG failover operations.",
                       "type": "object",
                       "properties": {
                         "Network": {
                           "type": "string",
+                          "description": "The name of the network to use for the NIC.",
                           "minLength": 1
                         },
                         "StaticIp": {
                           "type": "string",
+                          "description": "The static IP address to assign to the NIC.",
                           "minLength": 1
                         },
                         "SubnetMask": {
                           "type": "string",
+                          "description": "The subnet mask string for the corresponding IP address.",
                           "minLength": 1
                         },
                         "Gateway": {
                           "type": "string",
+                          "description": "The gateway to use for this NIC.",
                           "minLength": 1
                         }
                       },
@@ -101,7 +148,8 @@
                         "Network",
                         "StaticIp",
                         "SubnetMask"
-                      ]
+                      ],
+                      "additionalProperties": false
                     }
                   },
                   "required": [
@@ -118,10 +166,12 @@
         },
         "VPGName": {
           "type": "string",
+          "description": "The name for the VPG to create. Must be unique on the ZertoVM server.",
           "minLength": 1
         },
         "RecoverySiteName": {
           "type": "string",
+          "description": "The name of the remote site to use for this VPG.",
           "minLength": 1,
           "x-flowor-lookup": {
             "type": "zerto:VirtualizationSite",
@@ -131,6 +181,7 @@
         },
         "FailoverNetwork": {
           "type": "string",
+          "description": "The name of the network to use for this VPG when performing failover operations.",
           "minLength": 1,
           "watch": {
             "site": "vpgSetting.RecoverySiteName"
@@ -143,6 +194,7 @@
         },
         "TestNetwork": {
           "type": "string",
+          "description": "The name of the network to use for this VPG when testing VPG failover operations.",
           "minLength": 1,
           "watch": {
             "site": "vpgSetting.RecoverySiteName"
@@ -155,6 +207,7 @@
         },
         "HostName": {
           "type": "string",
+          "description": "The default host for the VMs specified for this VPG. You can either specify the HostName or the ClusterName for a VPG.",
           "watch": {
             "site": "vpgSetting.RecoverySiteName"
           },
@@ -166,6 +219,7 @@
         },
         "Folder": {
           "type": "string",
+          "description": "The name of the default folder where the VMs will be placed into.",
           "minLength": 1,
           "watch": {
             "site": "vpgSetting.RecoverySiteName"
@@ -178,6 +232,7 @@
         },
         "DatastoreName": {
           "type": "string",
+          "description": "The name of the datastore to use for the VMs in this VPG.",
           "minLength": 1,
           "watch": {
             "site": "vpgSetting.RecoverySiteName"
@@ -190,6 +245,7 @@
         },
         "ClusterName": {
           "type": "string",
+          "description": "The name of the cluster where VMs in the VPG will be placed into. You can either specify the HostName or the ClusterName for the VPG.",
           "watch": {
             "site": "vpgSetting.RecoverySiteName"
           },
@@ -200,24 +256,32 @@
           }
         },
         "JournalHistoryInHours": {
-          "type": "integer",
+          "type": "number",
+          "description": "The number of hours for the Journal history to be pruned.",
+          "minimum": 0,
           "default": 24
         },
         "ReplicationPriority": {
           "type": "string",
+          "description": "The priority for the VPG replication when doing failover operations. Can be one of 'Low', 'Medium' and 'High'.",
           "default": "Low",
           "enum": ["Low", "Medium", "High"]
         },
         "RpoAlertInSeconds": {
-          "type": "integer",
+          "type": "number",
+          "description": "The number of seconds above which the RPO will throw an alert.",
+          "minimum": 0,
           "default": 300
         },
         "TestIntervalInMinutes": {
           "type": "integer",
+          "description": "The number of minutes between two consequent testing of failover operations.",
+          "minimum": 0,
           "default": 0
         },
         "UseWanCompression": {
           "type": "boolean",
+          "description": "A boolean flag indicating whether compression will be turned on before data are transferred over WAN.",
           "default": true
         }
       },
